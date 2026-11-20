@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/doc_main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FAFAFC"
+    tools:context=".Activity_RegistroDocente">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingHorizontal="32dp"
+            android:paddingVertical="48dp"
+            android:gravity="center_horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Registro de Docente"
+                android:textColor="#212121"
+                android:textSize="28sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Ingresa tus datos para continuar"
+                android:textColor="#757575"
+                android:textSize="14sp"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="32dp"
+                android:textAlignment="center" />
+
+            <EditText
+                android:id="@+id/et_nombre_doc"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:hint="Nombre completo"
+                android:inputType="textPersonName"
+                android:textColor="#212121"
+                android:textColorHint="#757575"
+                android:layout_marginBottom="16dp"
+                android:paddingHorizontal="12dp" />
+
+            <EditText
+                android:id="@+id/et_clave_doc"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:hint="Clave de docente (9 caracteres)"
+                android:inputType="text"
+                android:maxLength="9"
+                android:textColor="#212121"
+                android:textColorHint="#757575"
+                android:layout_marginBottom="16dp"
+                android:paddingHorizontal="12dp" />
+
+            <EditText
+                android:id="@+id/et_password_doc"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:hint="Contraseña (mínimo 6 caracteres)"
+                android:inputType="textPassword"
+                android:textColor="#212121"
+                android:textColorHint="#757575"
+                android:layout_marginBottom="16dp"
+                android:paddingHorizontal="12dp" />
+
+            <EditText
+                android:id="@+id/et_codigo_doc"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:hint="Código de registro (opcional)"
+                android:inputType="text"
+                android:textColor="#212121"
+                android:textColorHint="#757575"
+                android:layout_marginBottom="32dp"
+                android:paddingHorizontal="12dp" />
+
+            <Button
+                android:id="@+id/btn_register_doc"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:text="Registrarse"
+                android:textSize="16sp"
+                android:backgroundTint="#5C43A0"
+                android:textColor="#FFFFFF"
+                android:layout_marginBottom="24dp" />
+
+            <TextView
+                android:id="@+id/tv_volver_doc"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Volver al inicio"
+                android:textColor="#757575"
+                android:textSize="14sp" />
+
+        </LinearLayout>
+    </ScrollView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

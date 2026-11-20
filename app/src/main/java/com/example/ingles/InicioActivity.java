@@ -11,7 +11,6 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
-// Pantalla a la que se llega después de iniciar sesión.
 public class InicioActivity extends AppCompatActivity {
 
     @Override
@@ -28,6 +27,7 @@ public class InicioActivity extends AppCompatActivity {
 
         TextView tvSaludo = findViewById(R.id.tv_saludo);
         TextView tvRol = findViewById(R.id.tv_rol);
+        Button btnConfiguracion = findViewById(R.id.btn_configuracion);
         Button btnSalir = findViewById(R.id.btn_salir);
 
         String nombre = Sesion.getNombre(this);
@@ -35,6 +35,11 @@ public class InicioActivity extends AppCompatActivity {
 
         tvSaludo.setText("Hola, " + (nombre != null ? nombre : ""));
         tvRol.setText("Sesión iniciada como " + (rol != null ? rol : ""));
+
+        btnConfiguracion.setOnClickListener(v -> {
+            Intent intent = new Intent(InicioActivity.this, ConfiguracionActivity.class);
+            startActivity(intent);
+        });
 
         btnSalir.setOnClickListener(v -> {
             Sesion.cerrar(InicioActivity.this);

@@ -26,14 +26,13 @@ public class MainActivity extends AppCompatActivity {
             return insets;
         });
 
-        // Es importante inicializar las variables con sus respectivos IDs del XML
-        b1 = findViewById(R.id.b1);
-        b2 = findViewById(R.id.b2);
+        b1 = findViewById(R.id.b1); // Crear cuenta de alumno
+        b2 = findViewById(R.id.b2); // Iniciar sesión
 
-        // Se usa un Intent para cambiar de pantalla correctamente
-        b1.setOnClickListener(v -> {
-            Intent intent = new Intent(MainActivity.this, Activity_Registro.class);
-            startActivity(intent);
-        });
+        b1.setOnClickListener(v ->
+                startActivity(new Intent(MainActivity.this, Activity_Registro.class)));
+
+        b2.setOnClickListener(v ->
+                startActivity(new Intent(MainActivity.this, LoginActivity.class)));
     }
 }

@@ -30,6 +30,17 @@
             android:name=".Activity_Registro"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".Activity_RegistroDocente"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".LoginActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".InicioActivity"
+            android:exported="false" />
     </application>
 
 </manifest>

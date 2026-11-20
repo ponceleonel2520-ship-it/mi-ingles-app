@@ -1,5 +1,6 @@
 package com.example.ingles;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.ArrayAdapter;
@@ -54,7 +55,11 @@ public class Activity_Registro extends AppCompatActivity {
 
         btnRegister.setOnClickListener(v -> registrarAlumno());
 
-        tvLoginLink.setOnClickListener(v -> finish());
+        // "¿Ya tienes cuenta? Inicia sesión" abre el login
+        tvLoginLink.setOnClickListener(v -> {
+            startActivity(new Intent(Activity_Registro.this, LoginActivity.class));
+            finish();
+        });
     }
 
     private void registrarAlumno() {
@@ -83,17 +88,18 @@ public class Activity_Registro extends AppCompatActivity {
                     ApiResponse apiResponse = response.body();
                     Toast.makeText(Activity_Registro.this, apiResponse.getMessage(), Toast.LENGTH_LONG).show();
                     if (apiResponse.getStatus() == 200 || apiResponse.getStatus() == 201) {
+                        // Registro exitoso: pasa directo al login, con la matrícula ya escrita
+                        Intent intent = new Intent(Activity_Registro.this, LoginActivity.class);
+                        intent.putExtra("tipo", "alumno");
+                        intent.putExtra("usuario", matricula);
+                        startActivity(intent);
                         finish();
                     }
                 } else {
-                    // Si CodeIgniter rechaza la petición, esto te mostrará el error exacto en pantalla
-                    try {
-                        String errorBody = response.errorBody() != null ? response.errorBody().string() : "Error desconocido";
-                        Log.e("ERROR_API", "Rechazo del servidor: " + errorBody);
-                        Toast.makeText(Activity_Registro.this, "Error del servidor. Código: " + response.code(), Toast.LENGTH_LONG).show();
-                    } catch (Exception e) {
-                        Toast.makeText(Activity_Registro.this, "Error procesando respuesta del servidor", Toast.LENGTH_SHORT).show();
-                    }
+                    // Muestra el mensaje real del backend (por ejemplo "Esa matrícula ya está registrada.")
+                    String mensaje = ApiError.mensaje(response);
+                    Log.e("ERROR_API", "Rechazo del servidor: " + mensaje);
+                    Toast.makeText(Activity_Registro.this, mensaje, Toast.LENGTH_LONG).show();
                 }
             }
 

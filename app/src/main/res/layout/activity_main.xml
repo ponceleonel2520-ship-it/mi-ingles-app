@@ -1,46 +1,107 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-xmlns:app="http://schemas.android.com/apk/res-auto"
-xmlns:tools="http://schemas.android.com/tools"
-android:id="@+id/main"
-android:layout_width="match_parent"
-android:layout_height="match_parent"
-tools:context=".MainActivity">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#1D63ED"
+    tools:context=".MainActivity">
 
-<LinearLayout
-    android:layout_width="0dp"
-    android:layout_height="wrap_content"
-    android:layout_marginHorizontal="32dp"
-    android:orientation="vertical"
-    android:gravity="center"
-    app:layout_constraintBottom_toBottomOf="parent"
-    app:layout_constraintEnd_toEndOf="parent"
-    app:layout_constraintStart_toStartOf="parent"
-    app:layout_constraintTop_toTopOf="parent">
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
-    <TextView
-        android:id="@+id/textView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Bienvenido a Vocabulario de Ingles"
-        android:textAlignment="center"
-        android:textSize="20sp"
-        android:textStyle="bold"
-        android:layout_marginBottom="24dp" />
+        <!-- Encabezado azul -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:paddingHorizontal="32dp">
 
-    <Button
-        android:id="@+id/b1"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Registro"
-        android:layout_marginBottom="8dp" />
+            <TextView
+                android:id="@+id/textView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="English Cards"
+                android:textAlignment="center"
+                android:textColor="#FFFFFF"
+                android:textSize="36sp"
+                android:textStyle="bold" />
 
-    <Button
-        android:id="@+id/b2"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Iniciar Sesión" />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="Aprende vocabulario en inglés con flashcards"
+                android:textAlignment="center"
+                android:textColor="#E4EDFF"
+                android:textSize="16sp" />
+        </LinearLayout>
 
-</LinearLayout>
+        <!-- Tarjeta blanca con las acciones -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp"
+            app:cardBackgroundColor="#FFFFFF"
+            app:cardCornerRadius="28dp"
+            app:cardElevation="8dp"
+            app:strokeWidth="0dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="24dp">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Empieza ahora"
+                    android:textColor="#0B1F4D"
+                    android:textSize="22sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:layout_marginBottom="20dp"
+                    android:text="Inicia sesión o crea tu cuenta de alumno"
+                    android:textColor="#5A6B8F"
+                    android:textSize="14sp" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/b2"
+                    android:layout_width="match_parent"
+                    android:layout_height="56dp"
+                    android:layout_marginBottom="12dp"
+                    android:backgroundTint="#1D63ED"
+                    android:text="Iniciar sesión"
+                    android:textColor="#FFFFFF"
+                    android:textSize="16sp"
+                    app:cornerRadius="28dp" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/b1"
+                    style="?attr/materialButtonOutlinedStyle"
+                    android:layout_width="match_parent"
+                    android:layout_height="56dp"
+                    android:text="Crear cuenta de alumno"
+                    android:textColor="#1D63ED"
+                    android:textSize="16sp"
+                    app:cornerRadius="28dp"
+                    app:strokeColor="#1D63ED" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

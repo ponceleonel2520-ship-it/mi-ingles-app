@@ -8,7 +8,7 @@ public class ApiClient {
     // Dirección del backend de CodeIgniter (el que se enciende con: php spark serve).
     //
     // Emulador de Android Studio: 10.0.2.2 es la forma en que el emulador "ve" tu laptop.
-    private static final String BASE_URL =  "http://192.168.1.67/ingles-api/public/";
+    private static final String BASE_URL = "http://10.0.2.2/ingles-api/public/";
     //
     // Teléfono real (laptop y teléfono en la misma red Wi-Fi): cambia la línea de arriba por la
     // IP de tu laptop, por ejemplo "http://192.168.1.50:8080/". La IP se ve con el comando ipconfig.

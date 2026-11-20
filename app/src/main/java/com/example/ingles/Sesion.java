@@ -12,11 +12,12 @@ public class Sesion {
         return contexto.getApplicationContext().getSharedPreferences(ARCHIVO, Context.MODE_PRIVATE);
     }
 
-    public static void guardar(Context contexto, String token, String rol, String nombre) {
+    public static void guardar(Context contexto, String token, String rol, String nombre, int id) {
         prefs(contexto).edit()
                 .putString("token", token)
                 .putString("rol", rol)
                 .putString("nombre", nombre)
+                .putInt("id", id)
                 .apply();
     }
 
@@ -30,6 +31,10 @@ public class Sesion {
 
     public static String getNombre(Context contexto) {
         return prefs(contexto).getString("nombre", null);
+    }
+
+    public static int getId(Context contexto) {
+        return prefs(contexto).getInt("id", 0);
     }
 
     public static void cerrar(Context contexto) {

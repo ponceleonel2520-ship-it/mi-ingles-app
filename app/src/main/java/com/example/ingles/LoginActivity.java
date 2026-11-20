@@ -87,8 +87,8 @@ public class LoginActivity extends AppCompatActivity {
                     ApiResponse datos = response.body();
                     String rol = datos.getRol() != null ? datos.getRol() : tipo;
 
-                    Sesion.guardar(LoginActivity.this, datos.getToken(), rol, datos.getNombre());
-
+                    Sesion.guardar(LoginActivity.this, datos.getToken(), rol, datos.getNombre(), datos.getId());
+                    android.util.Log.d("SESION", "id guardado = " + Sesion.getId(LoginActivity.this));
                     Intent intent = new Intent(LoginActivity.this, InicioActivity.class);
                     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(intent);

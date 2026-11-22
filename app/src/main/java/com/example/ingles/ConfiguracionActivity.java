@@ -14,6 +14,8 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.example.ingles.flotante.PalabrasDelDiaManager;
+
 import java.util.Locale;
 
 import retrofit2.Call;
@@ -81,6 +83,8 @@ public class ConfiguracionActivity extends AppCompatActivity {
         String freq = prefs.getString("frecuencia_test", "semanal");
         horaInicio = recortarHora(prefs.getString("hora_inicio", "07:00"));
         horaFin = recortarHora(prefs.getString("hora_fin", "19:00"));
+
+        PalabrasDelDiaManager.guardarHorario(this, horaInicio, horaFin);
 
         if ("mensual".equals(freq)) {
             rbMensual.setChecked(true);
@@ -156,6 +160,7 @@ public class ConfiguracionActivity extends AppCompatActivity {
                 .putString("hora_inicio", inicio)
                 .putString("hora_fin", fin)
                 .apply();
+        PalabrasDelDiaManager.guardarHorario(this, inicio, fin);
     }
 
     // Por si MySQL devuelve HH:MM:SS, recortamos a HH:MM para el PUT

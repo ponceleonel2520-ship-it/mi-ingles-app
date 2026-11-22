@@ -14,6 +14,9 @@ public class FlashcardEntity {
     public String traduccion;
     public String imagenUrl;
 
+    // Ruta de la imagen guardada en el teléfono (null si todavía no se descargó)
+    public String imagenLocal;
+
     public FlashcardEntity(int id, int categoriaId, String palabraIngles, String traduccion, String imagenUrl) {
         this.id = id;
         this.categoriaId = categoriaId;

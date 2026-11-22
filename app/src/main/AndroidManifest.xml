@@ -5,6 +5,13 @@
     <!-- Permiso necesario para hacer peticiones de red -->
     <uses-permission android:name="android.permission.INTERNET" />
 
+    <!-- Permisos para tarjeta flotante y servicio en primer plano (Android 14+) -->
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -43,6 +50,27 @@
         <activity
             android:name=".ConfiguracionActivity"
             android:exported="false" />
+
+        <!-- Servicio en primer plano que escucha encendido/desbloqueo de pantalla -->
+        <service
+            android:name=".flotante.TarjetaFlotanteService"
+            android:exported="false"
+            android:foregroundServiceType="specialUse">
+            <property
+                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
+                android:value="Muestra tarjetas educativas de vocabulario en inglés al encender o desbloquear la pantalla." />
+        </service>
+
+        <!-- Receptor para reiniciar el servicio si el teléfono se apaga y vuelve a encender -->
+        <receiver
+            android:name=".flotante.BootReceiver"
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+
     </application>
 
 </manifest>

@@ -82,13 +82,16 @@ public class SyncManager {
                     if (fcResp.isSuccessful() && fcResp.body() != null && fcResp.body().data != null) {
                         List<FlashcardEntity> entidadesFc = new ArrayList<>();
                         for (ApiService.FlashcardItem f : fcResp.body().data) {
-                            entidadesFc.add(new FlashcardEntity(
+                            FlashcardEntity entidad = new FlashcardEntity(
                                     f.id,
                                     f.categoriaId,
                                     f.palabraIngles,
                                     f.traduccion,
                                     f.imagenUrl
-                            ));
+                            );
+                            // Descarga la imagen al teléfono (o reutiliza la que ya está guardada)
+                            entidad.imagenLocal = ImagenLocal.obtener(appContext, f.id, f.imagenUrl);
+                            entidadesFc.add(entidad);
                         }
                         dao.limpiarFlashcardsDeCategoria(catId);
                         dao.guardarFlashcards(entidadesFc);

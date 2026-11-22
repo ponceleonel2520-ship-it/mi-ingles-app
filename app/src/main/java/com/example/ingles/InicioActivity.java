@@ -4,12 +4,15 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+
+import com.example.ingles.local.SyncManager;
 
 public class InicioActivity extends AppCompatActivity {
 
@@ -35,6 +38,11 @@ public class InicioActivity extends AppCompatActivity {
 
         tvSaludo.setText("Hola, " + (nombre != null ? nombre : ""));
         tvRol.setText("Sesión iniciada como " + (rol != null ? rol : ""));
+
+        // Sincronizar categorías, flashcards y resultados pendientes con Room
+        SyncManager.sincronizarTodo(this, (exito, mensaje) ->
+                Toast.makeText(InicioActivity.this, mensaje, Toast.LENGTH_SHORT).show()
+        );
 
         btnConfiguracion.setOnClickListener(v -> {
             Intent intent = new Intent(InicioActivity.this, ConfiguracionActivity.class);

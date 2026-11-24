@@ -40,6 +40,8 @@ public class TarjetaFlotanteService extends Service {
     private WindowManager windowManager;
     private View vistaFlotante;
     private final Handler handler = new Handler(Looper.getMainLooper());
+    private final java.util.concurrent.ExecutorService executor =
+            java.util.concurrent.Executors.newSingleThreadExecutor();
     private long ultimaVezMostradaMs = 0L;
 
     private final BroadcastReceiver pantallaReceiver = new BroadcastReceiver() {
@@ -70,20 +72,40 @@ public class TarjetaFlotanteService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         return START_STICKY;
     }
-
     private void intentarMostrarTarjeta() {
+        android.util.Log.d("TARJETA", "Evento de pantalla recibido");
+
         // Evita duplicar la tarjeta si SCREEN_ON y USER_PRESENT ocurren con menos de 5 segundos de diferencia
         long ahora = System.currentTimeMillis();
-        if (ahora - ultimaVezMostradaMs < 5000L) return;
+        if (ahora - ultimaVezMostradaMs < 5000L) {
+            android.util.Log.d("TARJETA", "Descartado: se mostró hace menos de 5 segundos");
+            return;
+        }
 
-        if (!Settings.canDrawOverlays(this)) return;
-        if (!PalabrasDelDiaManager.estaDentroDeHorario(this)) return;
+        if (!Settings.canDrawOverlays(this)) {
+            android.util.Log.d("TARJETA", "Descartado: falta el permiso de mostrar sobre otras apps");
+            return;
+        }
 
-        FlashcardEntity palabra = PalabrasDelDiaManager.obtenerPalabraAleatoriaDelDia(this);
-        if (palabra == null) return;
+        if (!PalabrasDelDiaManager.estaDentroDeHorario(this)) {
+            java.util.Calendar c = java.util.Calendar.getInstance();
+            android.util.Log.d("TARJETA", "Descartado: fuera de horario. Hora del emulador = "
+                    + c.get(java.util.Calendar.HOUR_OF_DAY) + ":" + c.get(java.util.Calendar.MINUTE));
+            return;
+        }
 
         ultimaVezMostradaMs = ahora;
-        mostrarTarjetaFlotante(palabra);
+
+        // La consulta a Room va en un hilo secundario; dibujar la tarjeta, en el principal
+        executor.execute(() -> {
+            FlashcardEntity palabra = PalabrasDelDiaManager.obtenerPalabraAleatoriaDelDia(this);
+            if (palabra == null) {
+                android.util.Log.d("TARJETA", "Descartado: no hay flashcards en Room (categorías bloqueadas o sin sincronizar)");
+                return;
+            }
+            android.util.Log.d("TARJETA", "Mostrando: " + palabra.palabraIngles);
+            handler.post(() -> mostrarTarjetaFlotante(palabra));
+        });
     }
 
     private void mostrarTarjetaFlotante(FlashcardEntity palabra) {
@@ -171,6 +193,7 @@ public class TarjetaFlotanteService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
+        executor.shutdown();
         try {
             unregisterReceiver(pantallaReceiver);
         } catch (Exception ignored) {

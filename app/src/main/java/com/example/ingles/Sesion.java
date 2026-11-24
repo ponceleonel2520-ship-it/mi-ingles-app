@@ -37,6 +37,16 @@ public class Sesion {
         return prefs(contexto).getInt("id", 0);
     }
 
+    public static void guardarCalificacionFinal(Context contexto, String notaFormateada) {
+        prefs(contexto).edit()
+                .putString("calificacion_final", notaFormateada)
+                .apply();
+    }
+
+    public static String getCalificacionFinal(Context contexto) {
+        return prefs(contexto).getString("calificacion_final", null);
+    }
+
     public static void cerrar(Context contexto) {
         prefs(contexto).edit().clear().apply();
     }

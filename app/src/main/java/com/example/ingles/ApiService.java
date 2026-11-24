@@ -28,7 +28,7 @@ public interface ApiService {
     @PUT("api/configuracion")
     Call<ConfiguracionResponse> guardarConfiguracion(@Body ConfiguracionData config);
 
-    // --- ENDPOINTS DE ESTUDIO Y SINCRONIZACIÓN (BLOQUE 5) ---
+    // --- ENDPOINTS DE ESTUDIO Y SINCRONIZACIÓN ---
 
     @GET("api/categorias")
     Call<CategoriasResponse> obtenerCategorias();
@@ -54,6 +54,8 @@ public interface ApiService {
         public boolean aprobada;
         @SerializedName("bloqueada_por_defecto")
         public boolean bloqueadaPorDefecto;
+        @SerializedName("calificacion_cerrada")
+        public Double calificacionCerrada;
     }
 
     class FlashcardsResponse {

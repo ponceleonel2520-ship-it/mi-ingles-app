@@ -17,6 +17,17 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // Si ya hay una sesión guardada, entrar directo a Inicio sin pedir login
+        String token = Sesion.getToken(this);
+        if (token != null && !token.trim().isEmpty()) {
+            Intent intent = new Intent(MainActivity.this, InicioActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(intent);
+            finish();
+            return;
+        }
+
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
 

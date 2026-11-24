@@ -5,9 +5,8 @@ import android.content.SharedPreferences;
 
 import com.example.ingles.local.AppDatabase;
 import com.example.ingles.local.CategoriaEntity;
-import com.example.ingles.local.EstudioDao;
 import com.example.ingles.local.FlashcardEntity;
-
+import com.example.ingles.local.EstudioDao;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -24,6 +23,7 @@ public class PalabrasDelDiaManager {
     private static final String KEY_IDS_DIA = "ids_palabras_dia";
     private static final String KEY_HORA_INICIO = "hora_inicio";
     private static final String KEY_HORA_FIN = "hora_fin";
+    private static final String KEY_CATEGORIA_ID = "categoria_flotante_id";
 
     public static void guardarHorario(Context context, String horaInicio, String horaFin) {
         if (horaInicio == null || horaFin == null) return;
@@ -33,6 +33,24 @@ public class PalabrasDelDiaManager {
                 .putString(KEY_HORA_INICIO, horaInicio)
                 .putString(KEY_HORA_FIN, horaFin)
                 .apply();
+    }
+
+    public static void guardarCategoriaFlotante(Context context, int categoriaId) {
+        SharedPreferences prefs = context.getApplicationContext()
+                .getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+        int anterior = prefs.getInt(KEY_CATEGORIA_ID, -1);
+        SharedPreferences.Editor editor = prefs.edit().putInt(KEY_CATEGORIA_ID, categoriaId);
+        // Si cambió de categoría, limpiar la selección del día para tomar nuevas palabras de inmediato
+        if (anterior != categoriaId) {
+            editor.remove(KEY_FECHA).remove(KEY_IDS_DIA);
+        }
+        editor.apply();
+    }
+
+    public static int obtenerCategoriaFlotante(Context context) {
+        return context.getApplicationContext()
+                .getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+                .getInt(KEY_CATEGORIA_ID, -1);
     }
 
     public static boolean estaDentroDeHorario(Context context) {
@@ -57,18 +75,31 @@ public class PalabrasDelDiaManager {
     public static FlashcardEntity obtenerPalabraAleatoriaDelDia(Context context) {
         Context appContext = context.getApplicationContext();
         EstudioDao dao = AppDatabase.getInstance(appContext).estudioDao();
+        SharedPreferences prefs = appContext.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
 
+        int categoriaSeleccionada = prefs.getInt(KEY_CATEGORIA_ID, -1);
         List<CategoriaEntity> categorias = dao.obtenerCategorias();
         List<FlashcardEntity> disponibles = new ArrayList<>();
+
         for (CategoriaEntity c : categorias) {
             if (!c.bloqueada) {
-                disponibles.addAll(dao.obtenerFlashcardsPorCategoria(c.id));
+                if (categoriaSeleccionada == -1 || c.id == categoriaSeleccionada) {
+                    disponibles.addAll(dao.obtenerFlashcardsPorCategoria(c.id));
+                }
+            }
+        }
+
+        // Respaldo: si la categoría elegida ya no tiene tarjetas o se bloqueó, usar todas las desbloqueadas
+        if (disponibles.isEmpty() && categoriaSeleccionada != -1) {
+            for (CategoriaEntity c : categorias) {
+                if (!c.bloqueada) {
+                    disponibles.addAll(dao.obtenerFlashcardsPorCategoria(c.id));
+                }
             }
         }
 
         if (disponibles.isEmpty()) return null;
 
-        SharedPreferences prefs = appContext.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
         String hoy = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
         String fechaGuardada = prefs.getString(KEY_FECHA, "");
         String idsGuardados = prefs.getString(KEY_IDS_DIA, "");

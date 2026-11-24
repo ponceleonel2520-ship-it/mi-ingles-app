@@ -3,9 +3,11 @@ package com.example.ingles;
 import android.app.TimePickerDialog;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
@@ -15,8 +17,13 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.example.ingles.flotante.PalabrasDelDiaManager;
+import com.example.ingles.local.AppDatabase;
+import com.example.ingles.local.CategoriaEntity;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.Executors;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -26,10 +33,14 @@ public class ConfiguracionActivity extends AppCompatActivity {
 
     private RadioGroup rgFrecuencia;
     private RadioButton rbSemanal, rbMensual;
-    private Button btnHoraInicio, btnHoraFin, btnGuardar, btnVolver;
+    private Button btnHoraInicio, btnHoraFin, btnTodasCategorias, btnGuardar, btnVolver;
+    private Spinner spCategoriaFlotante;
 
     private String horaInicio = "07:00";
     private String horaFin = "19:00";
+
+    private final List<Integer> listaIdsCategorias = new ArrayList<>();
+    private final List<String> listaNombresCategorias = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,16 +59,68 @@ public class ConfiguracionActivity extends AppCompatActivity {
         rbMensual = findViewById(R.id.rb_mensual);
         btnHoraInicio = findViewById(R.id.btn_hora_inicio);
         btnHoraFin = findViewById(R.id.btn_hora_fin);
+        spCategoriaFlotante = findViewById(R.id.sp_categoria_flotante);
+        btnTodasCategorias = findViewById(R.id.btn_todas_categorias);
         btnGuardar = findViewById(R.id.btn_guardar_config);
         btnVolver = findViewById(R.id.btn_volver_inicio);
 
+        cargarCategoriasSpinner();
         cargarConfiguracionLocal();
         cargarConfiguracionServidor();
 
         btnHoraInicio.setOnClickListener(v -> abrirReloj(true));
         btnHoraFin.setOnClickListener(v -> abrirReloj(false));
+        btnTodasCategorias.setOnClickListener(v -> {
+            if (!listaIdsCategorias.isEmpty()) {
+                spCategoriaFlotante.setSelection(0);
+                Toast.makeText(this, "Modo aleatorio: todas las categorías", Toast.LENGTH_SHORT).show();
+            }
+        });
         btnGuardar.setOnClickListener(v -> guardarConfiguracion());
         btnVolver.setOnClickListener(v -> finish());
+    }
+
+    private void cargarCategoriasSpinner() {
+        Executors.newSingleThreadExecutor().execute(() -> {
+            List<CategoriaEntity> categorias = AppDatabase.getInstance(getApplicationContext())
+                    .estudioDao()
+                    .obtenerCategorias();
+
+            List<Integer> ids = new ArrayList<>();
+            List<String> nombres = new ArrayList<>();
+
+            ids.add(-1);
+            nombres.add("Todas las categorías (Aleatorio)");
+
+            if (categorias != null) {
+                for (CategoriaEntity c : categorias) {
+                    if (!c.bloqueada) {
+                        ids.add(c.id);
+                        nombres.add(c.nombre);
+                    }
+                }
+            }
+
+            int guardadaId = PalabrasDelDiaManager.obtenerCategoriaFlotante(this);
+
+            runOnUiThread(() -> {
+                listaIdsCategorias.clear();
+                listaIdsCategorias.addAll(ids);
+                listaNombresCategorias.clear();
+                listaNombresCategorias.addAll(nombres);
+
+                ArrayAdapter<String> adapter = new ArrayAdapter<>(
+                        this,
+                        android.R.layout.simple_spinner_item,
+                        listaNombresCategorias
+                );
+                adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                spCategoriaFlotante.setAdapter(adapter);
+
+                int index = listaIdsCategorias.indexOf(guardadaId);
+                spCategoriaFlotante.setSelection(index >= 0 ? index : 0);
+            });
+        });
     }
 
     private void abrirReloj(boolean esInicio) {
@@ -130,6 +193,12 @@ public class ConfiguracionActivity extends AppCompatActivity {
         }
 
         String frecuencia = rbMensual.isChecked() ? "mensual" : "semanal";
+        int pos = spCategoriaFlotante.getSelectedItemPosition();
+        int categoriaId = (pos >= 0 && pos < listaIdsCategorias.size()) ? listaIdsCategorias.get(pos) : -1;
+
+        PalabrasDelDiaManager.guardarCategoriaFlotante(this, categoriaId);
+        guardarLocal(frecuencia, horaInicio, horaFin);
+
         btnGuardar.setEnabled(false);
 
         ConfiguracionData body = new ConfiguracionData(frecuencia, horaInicio, horaFin);
@@ -138,7 +207,6 @@ public class ConfiguracionActivity extends AppCompatActivity {
             public void onResponse(Call<ConfiguracionResponse> call, Response<ConfiguracionResponse> response) {
                 btnGuardar.setEnabled(true);
                 if (response.isSuccessful()) {
-                    guardarLocal(frecuencia, horaInicio, horaFin);
                     Toast.makeText(ConfiguracionActivity.this, "Configuración guardada", Toast.LENGTH_SHORT).show();
                     finish();
                 } else {
@@ -149,7 +217,8 @@ public class ConfiguracionActivity extends AppCompatActivity {
             @Override
             public void onFailure(Call<ConfiguracionResponse> call, Throwable t) {
                 btnGuardar.setEnabled(true);
-                Toast.makeText(ConfiguracionActivity.this, "Error de red: " + t.getMessage(), Toast.LENGTH_LONG).show();
+                Toast.makeText(ConfiguracionActivity.this, "Guardado localmente (sin conexión)", Toast.LENGTH_SHORT).show();
+                finish();
             }
         });
     }
@@ -163,7 +232,6 @@ public class ConfiguracionActivity extends AppCompatActivity {
         PalabrasDelDiaManager.guardarHorario(this, inicio, fin);
     }
 
-    // Por si MySQL devuelve HH:MM:SS, recortamos a HH:MM para el PUT
     private String recortarHora(String hora) {
         if (hora != null && hora.length() >= 5) {
             return hora.substring(0, 5);

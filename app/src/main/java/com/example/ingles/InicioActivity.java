@@ -42,6 +42,9 @@ public class InicioActivity extends AppCompatActivity {
 
         TextView tvSaludo = findViewById(R.id.tv_saludo);
         TextView tvRol = findViewById(R.id.tv_rol);
+        Button btnEstudiarFlashcards = findViewById(R.id.btn_estudiar_flashcards);
+        Button btnRealizarTest = findViewById(R.id.btn_realizar_test);
+        Button btnMisCalificaciones = findViewById(R.id.btn_mis_calificaciones);
         Button btnConfiguracion = findViewById(R.id.btn_configuracion);
         Button btnSalir = findViewById(R.id.btn_salir);
 
@@ -57,6 +60,18 @@ public class InicioActivity extends AppCompatActivity {
         );
 
         pedirPermisoNotificaciones();
+
+        btnEstudiarFlashcards.setOnClickListener(v ->
+                startActivity(new Intent(InicioActivity.this, CategoriasActivity.class))
+        );
+
+        btnRealizarTest.setOnClickListener(v ->
+                startActivity(new Intent(InicioActivity.this, TestActivity.class))
+        );
+
+        btnMisCalificaciones.setOnClickListener(v ->
+                startActivity(new Intent(InicioActivity.this, CalificacionesActivity.class))
+        );
 
         btnConfiguracion.setOnClickListener(v -> {
             Intent intent = new Intent(InicioActivity.this, ConfiguracionActivity.class);

@@ -37,6 +37,9 @@ public interface EstudioDao {
     void limpiarTodasFlashcards();
 
     // --- RESULTADOS PENDIENTES (MODO OFFLINE) ---
+    @Query("SELECT * FROM resultados_pendientes ORDER BY fechaRegistro DESC")
+    List<ResultadoPendienteEntity> obtenerTodosLosResultados();
+
     @Insert
     void insertarResultadoPendiente(ResultadoPendienteEntity resultado);
 

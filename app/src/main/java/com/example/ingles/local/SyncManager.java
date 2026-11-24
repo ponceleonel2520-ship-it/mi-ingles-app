@@ -7,6 +7,7 @@ import android.os.Looper;
 import com.example.ingles.ApiClient;
 import com.example.ingles.ApiResponse;
 import com.example.ingles.ApiService;
+import com.example.ingles.local.AppDatabase;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,11 +25,6 @@ public class SyncManager {
     private static final ExecutorService executor = Executors.newSingleThreadExecutor();
     private static final Handler mainHandler = new Handler(Looper.getMainLooper());
 
-    /**
-     * Sincroniza en segundo plano:
-     * 1. Envía resultados de tests pendientes al servidor.
-     * 2. Descarga categorías y flashcards desbloqueadas a Room.
-     */
     public static void sincronizarTodo(Context context, SyncCallback callback) {
         Context appContext = context.getApplicationContext();
 
@@ -49,7 +45,7 @@ public class SyncManager {
                     }
                 }
 
-                // 2. Descargar categorías del alumno
+                // 2. Descargar categorías con su estado y calificación cerrada por categoría
                 Response<ApiService.CategoriasResponse> catResp = api.obtenerCategorias().execute();
                 if (!catResp.isSuccessful() || catResp.body() == null || catResp.body().data == null) {
                     notificar(callback, false, "Sin conexión o error al actualizar categorías. Usando datos locales.");
@@ -66,7 +62,8 @@ public class SyncManager {
                             c.nivel,
                             c.orden,
                             c.bloqueadaPorDefecto,
-                            c.aprobada
+                            c.aprobada,
+                            c.calificacionCerrada
                     ));
                     if (!c.bloqueadaPorDefecto) {
                         idsDesbloqueadas.add(c.id);
@@ -89,7 +86,6 @@ public class SyncManager {
                                     f.traduccion,
                                     f.imagenUrl
                             );
-                            // Descarga la imagen al teléfono (o reutiliza la que ya está guardada)
                             entidad.imagenLocal = ImagenLocal.obtener(appContext, f.id, f.imagenUrl);
                             entidadesFc.add(entidad);
                         }
@@ -106,10 +102,6 @@ public class SyncManager {
         });
     }
 
-    /**
-     * Guarda el resultado de un test: intenta enviarlo al servidor y,
-     * si no hay internet, lo encola en Room para subirlo después.
-     */
     public static void registrarResultadoTest(Context context, int categoriaId, double calificacion, SyncCallback callback) {
         Context appContext = context.getApplicationContext();
 
@@ -123,11 +115,16 @@ public class SyncManager {
                 ).execute();
 
                 if (resp.isSuccessful()) {
+                    dao.insertarResultadoPendiente(new ResultadoPendienteEntity(
+                            categoriaId,
+                            calificacion,
+                            System.currentTimeMillis(),
+                            true
+                    ));
                     notificar(callback, true, "Calificación registrada en el servidor.");
                     return;
                 }
             } catch (Exception ignored) {
-                // Sin conexión: se guarda en la cola offline
             }
 
             dao.insertarResultadoPendiente(new ResultadoPendienteEntity(
